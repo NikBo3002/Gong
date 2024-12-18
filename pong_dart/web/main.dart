@@ -1,4 +1,5 @@
 import 'dart:html';
+import 'dart:math';
 
 enum Gamemode {
   normal,
@@ -54,9 +55,25 @@ class AIPlayer extends Player {
   
   final Ball ballRef;
   
+  double secondsPassed = 0;
+  Random random = Random();
+  double seconds = 0;
+  int randInt = 0;
+
+  double unboundedLerp(double a, double b, double t) {
+    return a + (b - a) * t;
+  }
+
   @override
   void update(double deltaTime) {
-    paddleY = ballRef.ballY - paddleHeight/2;
+    seconds += deltaTime;
+    if (randInt < 9) {
+      paddleY = unboundedLerp(paddleY, ballRef.ballY - paddleHeight / 2, 5 * deltaTime);
+    }
+    if (seconds > 0.2) {
+      seconds = 0;
+      randInt = random.nextInt(10);
+    }
   }
 }
 
@@ -68,7 +85,23 @@ class Ball {
   final double ballRadius = 10;
 }
 
-void main() async {  
+void main() {
+  var normalButton = querySelector("#normalButton") as ButtonElement;
+  var aiButton = querySelector("#aiButton") as ButtonElement;
+  normalButton.onClick.listen((MouseEvent event) {
+    game(Gamemode.normal);
+    normalButton.disabled = true;
+    aiButton.disabled = false;
+  });
+  aiButton.onClick.listen((MouseEvent event) {
+    game(Gamemode.ai);
+    normalButton.disabled = false;
+    aiButton.disabled = true;
+  });
+}
+
+void game(Gamemode gamemode) {
+  (querySelector("#gamemodeLabel") as LabelElement).innerHtml = "Gamemode: ${gamemode.name.toUpperCase()}";
   DateTime previousTime = DateTime.now();
 
   final CanvasElement canvas = querySelector('#gameCanvas') as CanvasElement;
@@ -78,8 +111,6 @@ void main() async {
   final Element player2ScoreElement = querySelector('#player2Score')!;
 
   final int padding = 20;
-
-  Gamemode gamemode = Gamemode.ai;
 
   late int canvasWidth;
   late int canvasHeight;

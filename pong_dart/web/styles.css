@@ -24,6 +24,24 @@ body {
   justify-content: flex-start;
   font-family: Arial, sans-serif;
 }
+button {
+  text-decoration: none;
+  padding: 5px 10px;
+  background-color: #007BFF;
+  font-size: 16px;
+  color: white;
+  border-radius: 10px;
+  border-color: transparent;
+}
+button:hover {
+  background-color: #2185f0;
+}
+button:disabled {
+  background-color: #003976;
+}
+.gamemodeMenu {
+  margin-top: 15px
+}
 #scores {
   display: flex;
   justify-content: space-between;
