@@ -3945,7 +3945,7 @@
       t2.toString;
       canvasWidth = A._Cell$named("canvasWidth");
       canvasHeight = A._Cell$named("canvasHeight");
-      ball = new A.Ball();
+      ball = new A.Ball(3, 2, 10);
       player1 = A.HumanPlayer$("s", "w", 100, 20);
       if (gamemode === B.Gamemode_0)
         player2 = A.HumanPlayer$("ArrowDown", "ArrowUp", 100, 20);
@@ -3993,11 +3993,12 @@
       _.__Player_paddleY_A = $;
       _.goingDown = _.goingUp = false;
     },
-    Ball: function Ball() {
+    Ball: function Ball(t0, t1, t2) {
       var _ = this;
-      _.ballY = _.ballX = 0;
-      _.ballSpeedX = 3;
-      _.ballSpeedY = 2;
+      _.speedX = t0;
+      _.speedY = t1;
+      _.radius = t2;
+      _.y = _.x = 0;
     },
     main_closure: function main_closure(t0, t1) {
       this.normalButton = t0;
@@ -6406,7 +6407,7 @@
       if (_this.randInt < 9) {
         t2 = _this.__Player_paddleY_A;
         t2 === $ && A.throwLateFieldNI("paddleY");
-        _this.__Player_paddleY_A = t2 + (_this.ballRef.ballY - _this.paddleHeight / 2 - t2) * (5 * deltaTime);
+        _this.__Player_paddleY_A = t2 + (_this.ballRef.y - _this.paddleHeight / 2 - t2) * (5 * deltaTime);
       }
       if (t1 > 0.2) {
         _this.seconds = 0;
@@ -6439,13 +6440,13 @@
         t2 = this.canvasWidth._readLocal$0();
       if (typeof t2 !== "number")
         return t2.$div();
-      t1.ballX = t2 / 2;
+      t1.x = t2 / 2;
       t2 = this.canvasHeight._readLocal$0();
       if (typeof t2 !== "number")
         return t2.$div();
-      t1.ballY = t2 / 2;
-      t1.ballSpeedX = 3;
-      t1.ballSpeedY = 2;
+      t1.y = t2 / 2;
+      t1.speedX = 3;
+      t1.speedY = 2;
     },
     $signature: 0
   };
@@ -6492,17 +6493,17 @@
       t1 = t1._readLocal$0();
       if (typeof t1 !== "number")
         return t1.$div();
-      t4.ballX = t1 / 2;
+      t4.x = t1 / 2;
       t2 = t2._readLocal$0();
       if (typeof t2 !== "number")
         return t2.$div();
-      t4.ballY = t2 / 2;
+      t4.y = t2 / 2;
     },
     $signature: 0
   };
   A.game_update.prototype = {
     call$0() {
-      var t4, t5, t6, t7, t8, t9, t10, t11, _this = this,
+      var t4, t5, t6, t7, t8, t9, t10, t11, t12, _this = this,
         t1 = Date.now(),
         t2 = _this._box_0,
         t3 = t2.previousTime;
@@ -6516,76 +6517,77 @@
       B.CanvasRenderingContext2D_methods.clearRect$4(t3, 0, 0, t2._readLocal$0(), t4._readLocal$0());
       t3.beginPath();
       t5 = _this.ball;
-      t3.arc(t5.ballX, t5.ballY, 10, 0, 6.28, false);
+      t6 = t5.radius;
+      t3.arc(t5.x, t5.y, t6, 0, 6.28, false);
       B.CanvasRenderingContext2D_methods.set$fillStyle(t3, "white");
       t3.fill();
       t3.closePath();
       B.CanvasRenderingContext2D_methods.set$fillStyle(t3, "white");
-      t6 = _this.player1;
-      t7 = t6.paddleX;
-      t8 = t6.__Player_paddleY_A;
+      t7 = _this.player1;
+      t8 = t7.paddleX;
+      t9 = t7.__Player_paddleY_A;
+      t9 === $ && A.throwLateFieldNI("paddleY");
+      t10 = t7.paddleWidth;
+      t11 = t7.paddleHeight;
+      t3.fillRect(t8, t9, t10, t11);
+      t9 = t1.paddleX;
+      t8 = t1.__Player_paddleY_A;
       t8 === $ && A.throwLateFieldNI("paddleY");
-      t9 = t6.paddleWidth;
-      t10 = t6.paddleHeight;
-      t3.fillRect(t7, t8, t9, t10);
-      t8 = t1.paddleX;
-      t7 = t1.__Player_paddleY_A;
-      t7 === $ && A.throwLateFieldNI("paddleY");
-      t11 = t1.paddleHeight;
-      t3.fillRect(t8, t7, t1.paddleWidth, t11);
-      t5.ballX = t5.ballX + t5.ballSpeedX;
-      t7 = t5.ballY + t5.ballSpeedY;
-      t5.ballY = t7;
+      t12 = t1.paddleHeight;
+      t3.fillRect(t9, t8, t1.paddleWidth, t12);
+      t5.x = t5.x + t5.speedX;
+      t8 = t5.y + t5.speedY;
+      t5.y = t8;
       t3 = t4._readLocal$0();
       if (typeof t3 !== "number")
         return A.iae(t3);
-      if (t7 + 10 > t3 || t5.ballY - 10 < 0)
-        t5.ballSpeedY = -t5.ballSpeedY;
-      t3 = t5.ballX;
-      t7 = t3 - 10;
-      if (t7 < t6.paddleX + t9) {
-        t8 = t5.ballY;
-        t9 = t6.__Player_paddleY_A;
-        t8 = t8 > t9 && t8 < t9 + t10;
+      if (t8 + t6 > t3 || t5.y - t6 < 0)
+        t5.speedY = -t5.speedY;
+      t3 = t5.x;
+      t8 = t3 - t6;
+      if (t8 < t7.paddleX + t10) {
+        t9 = t5.y;
+        t10 = t7.__Player_paddleY_A;
+        t9 = t9 > t10 && t9 < t10 + t11;
       } else
-        t8 = false;
-      if (t8)
-        t5.ballSpeedX = -t5.ballSpeedX;
-      if (t3 + 10 > t1.paddleX) {
-        t3 = t5.ballY;
-        t8 = t1.__Player_paddleY_A;
-        t3 = t3 > t8 && t3 < t8 + t11;
+        t9 = false;
+      if (t9)
+        t5.speedX = -t5.speedX;
+      if (t3 + t6 > t1.paddleX) {
+        t3 = t5.y;
+        t9 = t1.__Player_paddleY_A;
+        t3 = t3 > t9 && t3 < t9 + t12;
       } else
         t3 = false;
       if (t3)
-        t5.ballSpeedX = -t5.ballSpeedX;
-      if (t7 < 0) {
+        t5.speedX = -t5.speedX;
+      if (t8 < 0) {
         ++t1.score;
         _this.updateScores.call$0();
         _this.resetGame.call$0();
       }
-      t3 = t5.ballX;
+      t3 = t5.x;
       t2 = t2._readLocal$0();
       if (typeof t2 !== "number")
         return A.iae(t2);
-      if (t3 + 10 > t2) {
-        ++t6.score;
+      if (t3 + t6 > t2) {
+        ++t7.score;
         _this.updateScores.call$0();
         _this.resetGame.call$0();
       }
-      if (t6.goingUp && t6.__Player_paddleY_A > 0)
-        t6.__Player_paddleY_A = t6.__Player_paddleY_A - 5;
-      if (t6.goingDown) {
-        t2 = t6.__Player_paddleY_A;
+      if (t7.goingUp && t7.__Player_paddleY_A > 0)
+        t7.__Player_paddleY_A = t7.__Player_paddleY_A - 5;
+      if (t7.goingDown) {
+        t2 = t7.__Player_paddleY_A;
         t3 = t4._readLocal$0();
         if (typeof t3 !== "number")
           return A.iae(t3);
-        t3 = t2 + t10 < t3;
+        t3 = t2 + t11 < t3;
         t2 = t3;
       } else
         t2 = false;
       if (t2)
-        t6.__Player_paddleY_A = t6.__Player_paddleY_A + 5;
+        t7.__Player_paddleY_A = t7.__Player_paddleY_A + 5;
       if (t1.goingUp && t1.__Player_paddleY_A > 0)
         t1.__Player_paddleY_A = t1.__Player_paddleY_A - 5;
       if (t1.goingDown) {
@@ -6593,7 +6595,7 @@
         t4 = t4._readLocal$0();
         if (typeof t4 !== "number")
           return A.iae(t4);
-        t4 = t2 + t11 < t4;
+        t4 = t2 + t12 < t4;
         t2 = t4;
       } else
         t2 = false;

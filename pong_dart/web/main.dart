@@ -68,7 +68,7 @@ class AIPlayer extends Player {
   void update(double deltaTime) {
     seconds += deltaTime;
     if (randInt < 9) {
-      paddleY = unboundedLerp(paddleY, ballRef.ballY - paddleHeight / 2, 5 * deltaTime);
+      paddleY = unboundedLerp(paddleY, ballRef.y - paddleHeight / 2, 5 * deltaTime);
     }
     if (seconds > 0.2) {
       seconds = 0;
@@ -78,11 +78,14 @@ class AIPlayer extends Player {
 }
 
 class Ball {
-  double ballX = 0;
-  double ballY = 0;
-  double ballSpeedX = 3;
-  double ballSpeedY = 2;
-  final double ballRadius = 10;
+  Ball({required this.speedX, required this.speedY, required this.radius});
+
+  double speedX;
+  double speedY;
+  final double radius;
+  
+  double x = 0;
+  double y = 0;
 }
 
 void main() {
@@ -115,17 +118,17 @@ void game(Gamemode gamemode) {
   late int canvasWidth;
   late int canvasHeight;
 
-  Ball ball = Ball();
+  Ball ball = Ball(speedX: 3, speedY: 2, radius: 10);
   Player player1 = HumanPlayer(paddleWidth: 20, paddleHeight: 100, keyUpName: "w", keyDownName: "s");
   Player player2 = gamemode == Gamemode.normal
                   ? HumanPlayer(paddleWidth: 20, paddleHeight: 100, keyUpName: "ArrowUp", keyDownName: "ArrowDown")
                   : AIPlayer(paddleWidth: 20, paddleHeight: 100, ballRef: ball);
   
   void resetGame() {
-    ball.ballX = canvasWidth / 2;
-    ball.ballY = canvasHeight / 2;
-    ball.ballSpeedX = 3;
-    ball.ballSpeedY = 2;
+    ball.x = canvasWidth / 2;
+    ball.y = canvasHeight / 2;
+    ball.speedX = 3;
+    ball.speedY = 2;
   }
 
   void updateScores() {
@@ -144,8 +147,8 @@ void game(Gamemode gamemode) {
     player2.paddleX = canvasWidth - player2.paddleWidth - padding.toDouble();
     player2.paddleY = (canvasHeight - player2.paddleHeight) / 2;
 
-    ball.ballX = canvasWidth / 2;
-    ball.ballY = canvasHeight / 2;
+    ball.x = canvasWidth / 2;
+    ball.y = canvasHeight / 2;
   }
 
   void update() {
@@ -159,7 +162,7 @@ void game(Gamemode gamemode) {
     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
     ctx.beginPath();
-    ctx.arc(ball.ballX, ball.ballY, ball.ballRadius, 0, 3.14 * 2);
+    ctx.arc(ball.x, ball.y, ball.radius, 0, 3.14 * 2);
     ctx.fillStyle = 'white';
     ctx.fill();
     ctx.closePath();
@@ -168,30 +171,30 @@ void game(Gamemode gamemode) {
     ctx.fillRect(player1.paddleX, player1.paddleY, player1.paddleWidth, player1.paddleHeight); // Player 1
     ctx.fillRect(player2.paddleX, player2.paddleY, player2.paddleWidth, player2.paddleHeight); // Player 2
 
-    ball.ballX += ball.ballSpeedX;
-    ball.ballY += ball.ballSpeedY;
+    ball.x += ball.speedX;
+    ball.y += ball.speedY;
 
-    if (ball.ballY + ball.ballRadius > canvasHeight || ball.ballY - ball.ballRadius < 0) {
-      ball.ballSpeedY = -ball.ballSpeedY;
+    if (ball.y + ball.radius > canvasHeight || ball.y - ball.radius < 0) {
+      ball.speedY = -ball.speedY;
     }
 
-    if (ball.ballX - ball.ballRadius < player1.paddleX + player1.paddleWidth &&
-        ball.ballY > player1.paddleY &&
-        ball.ballY < player1.paddleY + player1.paddleHeight) {
-      ball.ballSpeedX = -ball.ballSpeedX;
+    if (ball.x - ball.radius < player1.paddleX + player1.paddleWidth &&
+        ball.y > player1.paddleY &&
+        ball.y < player1.paddleY + player1.paddleHeight) {
+      ball.speedX = -ball.speedX;
     }
-    if (ball.ballX + ball.ballRadius > player2.paddleX &&
-        ball.ballY > player2.paddleY &&
-        ball.ballY < player2.paddleY + player2.paddleHeight) {
-      ball.ballSpeedX = -ball.ballSpeedX;
+    if (ball.x + ball.radius > player2.paddleX &&
+        ball.y > player2.paddleY &&
+        ball.y < player2.paddleY + player2.paddleHeight) {
+      ball.speedX = -ball.speedX;
     }
 
-    if (ball.ballX - ball.ballRadius < 0) {
+    if (ball.x - ball.radius < 0) {
       player2.score++;
       updateScores();
       resetGame();
     }
-    if (ball.ballX + ball.ballRadius > canvasWidth) {
+    if (ball.x + ball.radius > canvasWidth) {
       player1.score++;
       updateScores();
       resetGame();
