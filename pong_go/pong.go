@@ -23,6 +23,7 @@ type Game struct {
 	ballDirX, ballDirY int
 	paddle1Y, paddle2Y int
 	score1, score2     int
+	mode               byte
 }
 
 func (g *Game) draw() {
@@ -42,8 +43,12 @@ func (g *Game) draw() {
 		}
 		fmt.Println()
 	}
-	fmt.Printf("Score: Player 1 = %d, Player 2 = %d\n", g.score1, g.score2)
-	fmt.Println("Press 'w' to move up, 's' to move down, or 'q' to quit.")
+	fmt.Printf("Bodovi: Igrač 1 = %d, Igrač 2 = %d\n", g.score1, g.score2)
+	if g.mode == '1' {
+		fmt.Println("Klikni 'w' za kretanje prema gore, 's' za kretanje prema dole ili 'q' za izlaz.")
+	} else if g.mode == '2' {
+		fmt.Println("Klikni 'w' za kretanje prema gore, 's' za kretanje prema dole, klikni 'o' za za kretanje prema gore, 'l' za kretanje prema dole ili 'q' za izlaz.")
+	}
 }
 
 func (g *Game) update() {
@@ -143,7 +148,7 @@ func main() {
 
 	// Initialize keyboard input
 	if err := keyboard.Open(); err != nil {
-		fmt.Println("Failed to open keyboard:", err)
+		fmt.Println("Neuspjeh u otvaranja tipkovnice:", err)
 		return
 	}
 	defer keyboard.Close()
@@ -153,15 +158,16 @@ func main() {
 
 	// Get mode selection
 	reader := bufio.NewReader(os.Stdin)
-	fmt.Print("1.AI\n2.PvP\nChoose mode: ")
+	fmt.Print("1.AI\n2.PvP\nOdaberi mod: ")
 	mode, _ := reader.ReadByte()
+	game.mode = mode
 
 	// Main game loop
 	go func() {
 		for {
 			char, _, err := keyboard.GetKey()
 			if err != nil {
-				fmt.Println("Error reading key:", err)
+				fmt.Println("Error čitanja ključa:", err)
 				break
 			}
 			switch char {
@@ -197,5 +203,5 @@ func main() {
 		}
 	}
 
-	fmt.Println("Game Over. Thanks for playing!")
+	fmt.Println("Game Over. Hvala na igranju!!")
 }
